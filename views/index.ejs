@@ -3,20 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Join Threadline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111118;
+            --border: rgba(255,255,255,0.07);
+            --accent: #e8ff47;
+            --accent2: #ff6b47;
+            --text: #f0ede8;
+            --muted: #6b6878;
+            --input-bg: rgba(255,255,255,0.04);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        /* Left panel */
+        .left-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 52px 60px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,107,71,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .brand-dot {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-dot svg { width: 16px; height: 16px; }
+
+        .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-text {
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(42px, 5vw, 72px);
+            font-weight: 900;
+            line-height: 1.0;
+            letter-spacing: -2px;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+
+        .hero-text h1 span {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .hero-text p {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 360px;
+            font-weight: 300;
+        }
+
+        .testimonial {
+            z-index: 1;
+            border-left: 2px solid var(--accent);
+            padding-left: 20px;
+        }
+
+        .testimonial p {
+            font-size: 14px;
+            color: var(--muted);
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .testimonial span {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Right panel */
+        .right-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 52px 60px;
+            overflow-y: auto;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .form-header p a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .field input {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            width: 100%;
+        }
+
+        .field input:focus {
+            border-color: var(--accent);
+            background: rgba(232,255,71,0.03);
+        }
+
+        .field input::placeholder { color: var(--muted); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #0a0a0f;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(232,255,71,0.3);
+        }
+
+        .submit-btn:active { transform: translateY(0); }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        @media (max-width: 768px) {
+            body { grid-template-columns: 1fr; }
+            .left-panel { display: none; }
+            .right-panel { padding: 40px 24px; }
+        }
+    </style>
 </head>
 <body>
-    <div class="w-full min-h-screen bg-zinc-900 text-white ">
-        <h3 class="text-2xl mb-6">Create Account</h3>
-        <form action="/register" method="post" class="p-6 rounded-lg">
-            <input class ="px-3 py-2 outline-none bg-transparent rounded-md border-2 border-zinc-800" type="text" placeholder="name" name="name" class="bg-zinc-600 text-white placeholder:text-zinc-400 border border-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input class ="px-3 py-2 outline-none bg-transparent rounded-md border-2 border-zinc-800" type="text" placeholder="username" name="username" class="bg-zinc-600 text-white placeholder:text-zinc-400 border border-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input class ="px-3 py-2 outline-none bg-transparent rounded-md border-2 border-zinc-800" type="number" placeholder="age" name="age" class="bg-zinc-600 text-white placeholder:text-zinc-400 border border-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input class ="px-3 py-2 outline-none bg-transparent rounded-md border-2 border-zinc-800" type="email" placeholder="email" name="email" class="bg-zinc-600 text-white placeholder:text-zinc-400 border border-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input class ="px-3 py-2 outline-none bg-transparent rounded-md border-2 border-zinc-800" type="password" placeholder="password" name="password">
-            <input class ="px-3 py-2 bg-blue-500 text-sm rounded-md" type="submit" value="Create Account">
-        </form>
+    <div class="left-panel">
+        <div class="brand">
+            <div class="brand-dot">
+                <svg viewBox="0 0 16 16" fill="#0a0a0f">
+                    <path d="M8 2L10.5 7H14L11 10L12.5 14L8 11.5L3.5 14L5 10L2 7H5.5L8 2Z"/>
+                </svg>
+            </div>
+            <span class="brand-name">Threadline</span>
+        </div>
+
+        <div class="hero-text">
+            <h1>Your<br>thoughts,<br><span>amplified.</span></h1>
+            <p>A space to share ideas, connect with thinkers, and build your voice in public.</p>
+        </div>
+
+        <div class="testimonial">
+            <p>"Finally a platform that feels like it was built for actual humans who care about what they write."</p>
+            <span>Early Member</span>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Create Account</h2>
+                <p>Already have one? <a href="/login">Sign in instead →</a></p>
+            </div>
+
+            <form action="/register" method="post">
+                <div class="form-row">
+                    <div class="field">
+                        <label>Full Name</label>
+                        <input type="text" name="name" placeholder="Jane Doe" required>
+                    </div>
+                    <div class="field">
+                        <label>Username</label>
+                        <input type="text" name="username" placeholder="@janedoe" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="field">
+                        <label>Age</label>
+                        <input type="number" name="age" placeholder="24" required>
+                    </div>
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="jane@example.com" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••••" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Create my account →</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

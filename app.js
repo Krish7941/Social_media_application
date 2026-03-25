@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const postModel = require('./models/post');
+const user = require('./models/user');
 
 app.set('view engine', 'ejs');
 app.use(express.json());
@@ -66,7 +67,8 @@ app.post('/register', async (req, res) => {
     let { name, username, age, email, password } = req.body;
     let user = await userModel.findOne({email});
     if(user){
-        return res.status(500).json({error: "User already registered"});
+        return res.status(500).redirect("/register")
+        
     }
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt,async (err, hash) => {
@@ -79,7 +81,7 @@ app.post('/register', async (req, res) => {
             })
             let token = jwt.sign({email:email , userid: user._id},"shhh");
             res.cookie("token", token);
-            res.send("User registered successfully");
+            res.send("User registered successfully").redirect("/profile");
         });
     });
 });
@@ -106,6 +108,19 @@ app.get('/logout', (req, res) => {
     res.cookie("token", "")
     res.redirect("/login");
 });
+
+app.post('/delete/:id', isLoggedIn , async (req, res) => {
+    let post = await postModel.findById(req.params.id).populate("user");
+    await postModel.findByIdAndDelete(req.params.id);
+    if(post.user.posts.indexOf(req.params.id) !== -1){
+        post.user.posts.splice(post.user.posts.indexOf(req.params.id), 1);
+        await post.user.save();
+    }
+    await user.save();
+    
+    res.redirect("/profile");
+});
+
 
 function isLoggedIn(req, res, next){
     if(req.cookies.token === ""){
