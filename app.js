@@ -19,6 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/register', (req, res) => {
     res.render("index.ejs");
 });
+
 app.get('/login', async (req, res) => {
     let totalPosts = await postModel.countDocuments();
     let activeWriters = await userModel.countDocuments({posts: {$exists: true, $not: {$size: 0}}});
@@ -39,6 +40,15 @@ app.get('/profile', isLoggedIn , async (req, res) => {
     res.render("profile", {user, activePage: "profile"});
 });
 
+app.get('/userProfile', isLoggedIn , async (req, res) => {
+    const user = await userModel.findOne({ email: req.user.email });
+    res.redirect(`/userProfile/${user._id}`);
+});
+app.get('/userProfile/:id', isLoggedIn , async (req, res) => {
+    let user = await userModel.findById(req.params.id).populate("posts");
+    res.render("userProfile", {user, activePage: "userProfile"});
+
+});
 app.get('/profile/upload', async (req, res) => {
     res.render('profileUpload.ejs');
 });
@@ -63,8 +73,6 @@ app.get('/like/:id', isLoggedIn , async (req, res) => {
     res.redirect("/feed");    
 });
 
-
-
 app.get('/edit/:id', isLoggedIn , async (req, res) => {
     let post = await postModel.findById(req.params.id).populate("user");
     
@@ -77,6 +85,7 @@ app.post('/update/:id', isLoggedIn , async (req, res) => {
     await post.save();
     res.redirect("/profile");
 });
+
 app.post('/post', isLoggedIn , async (req, res) => {
     let user = await userModel.findOne({email: req.user.email});
     let {content} = req.body;
